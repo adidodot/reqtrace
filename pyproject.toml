@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "reqtrace"
+name = "reqtrace-py"
 version = "0.2.0"
 description = "Lightweight HTTP request/response logger and debugger for FastAPI"
 readme = "README.md"
