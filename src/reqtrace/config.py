@@ -1,6 +1,8 @@
 from dataclasses import dataclass
-from typing import Literal, Optional
+from typing import Literal, Optional, TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from .filter import ReqTraceFilter
 
 OutputMode = Literal["terminal", "file", "both"]
 FileFormat = Literal["json", "txt"]
@@ -43,6 +45,11 @@ class ReqTraceConfig:
         Keyboard shortcut to clear the terminal while the server
         is running. Example: "c". Set to None to disable.
         Defaults to "c".
+
+    filters : ReqTraceFilter, optional
+        Filter configuration. Control which requests are logged
+        based on route, method, and status code.
+        Defaults to None (log everything).
     """
 
     output: OutputMode = "terminal"
@@ -51,6 +58,7 @@ class ReqTraceConfig:
     enabled: bool = True
     diff: bool = False
     clear_key: Optional[str] = "c"
+    filters: Optional["ReqTraceFilter"] = None
 
     def __post_init__(self) -> None:
         self._validate()

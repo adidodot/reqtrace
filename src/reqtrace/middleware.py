@@ -52,6 +52,11 @@ class ReqTraceMiddleware(BaseHTTPMiddleware):
         url: str = str(request.url.path)
         status_code: int = response.status_code
 
+        # --- cek filter sebelum log ---
+        if self.config.filters is not None:
+            if not self.config.filters.should_log(method, url, status_code):
+                return response
+
         if self.config.use_terminal:
             print(
                 format_log(
@@ -110,7 +115,6 @@ class ReqTraceMiddleware(BaseHTTPMiddleware):
         def _listen() -> None:
             while True:
                 try:
-                    # polling setiap 100ms — tidak memblokir stdin
                     if _key_available():
                         char = _read_single_char_nonblock()
                         if char and char.lower() == key.lower():
@@ -167,7 +171,6 @@ class ReqTraceMiddleware(BaseHTTPMiddleware):
 
 
 def _clear_terminal() -> None:
-    """Clear terminal — cross-platform."""
     if sys.platform == "win32":
         os.system("cls")
     else:
@@ -175,10 +178,6 @@ def _clear_terminal() -> None:
 
 
 def _key_available() -> bool:
-    """
-    Cek apakah ada input keyboard tersedia tanpa memblokir.
-    Cross-platform: Windows (msvcrt.kbhit) dan Unix (select).
-    """
     if sys.platform == "win32":
         import msvcrt
 
@@ -189,10 +188,6 @@ def _key_available() -> bool:
 
 
 def _read_single_char_nonblock() -> str:
-    """
-    Baca satu karakter yang sudah tersedia di buffer.
-    Hanya dipanggil setelah _key_available() mengembalikan True.
-    """
     if sys.platform == "win32":
         import msvcrt
 

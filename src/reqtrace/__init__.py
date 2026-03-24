@@ -17,18 +17,20 @@ app.add_middleware(ReqTraceMiddleware, config=rt.config)
 
 from .config import ReqTraceConfig, OutputMode, FileFormat
 from .differ import DiffResult, SnapshotStore, compute_diff
+from .filter import ReqTraceFilter
 from .middleware import ReqTraceMiddleware
 
 __all__ = [
     "ReqTrace",
     "ReqTraceMiddleware",
     "ReqTraceConfig",
+    "ReqTraceFilter",
     "DiffResult",
     "SnapshotStore",
     "compute_diff",
 ]
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 
 class ReqTrace:
@@ -46,29 +48,36 @@ class ReqTrace:
     enabled : bool
         Master on/off switch. Defaults to True.
     diff : bool
-        Auto-diff mode. Compares each response against the previous
-        response for the same endpoint automatically.
-        Defaults to False.
+        Auto-diff mode. Defaults to False.
     clear_key : str, optional
-        Keyboard shortcut to clear the terminal. Defaults to "c".
-        Set to None to disable.
+        Terminal clear shortcut. Defaults to "c". None to disable.
+    filters : ReqTraceFilter, optional
+        Filter which requests are logged. Defaults to None (log all).
 
     Examples
     --------
     # Terminal only
     rt = ReqTrace(output="terminal")
 
-    # Dengan auto-diff
-    rt = ReqTrace(output="terminal", diff=True)
+    # Blacklist — sembunyikan /docs dan semua GET 200
+    rt = ReqTrace(
+        output="terminal",
+        filters=ReqTraceFilter(
+            mode="blacklist",
+            routes=["/docs", "/redoc", "/openapi.json"],
+            methods=["GET"],
+            status_codes=[200],
+        )
+    )
 
-    # Diff + simpan ke file
-    rt = ReqTrace(output="both", file_path="logs/trace.json", diff=True)
-
-    # Nonaktifkan clear key
-    rt = ReqTrace(output="terminal", clear_key=None)
-
-    # Disabled (e.g. in production)
-    rt = ReqTrace(output="terminal", enabled=False)
+    # Whitelist — hanya log error
+    rt = ReqTrace(
+        output="terminal",
+        filters=ReqTraceFilter(
+            mode="whitelist",
+            status_codes=["4xx", "5xx"],
+        )
+    )
     """
 
     def __init__(
@@ -79,6 +88,7 @@ class ReqTrace:
         enabled: bool = True,
         diff: bool = False,
         clear_key: str | None = "c",
+        filters: ReqTraceFilter | None = None,
     ) -> None:
         self.config = ReqTraceConfig(
             output=output,
@@ -87,4 +97,5 @@ class ReqTrace:
             enabled=enabled,
             diff=diff,
             clear_key=clear_key,
+            filters=filters,
         )
