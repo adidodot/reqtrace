@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.png" alt="reqtrace-py logo" width="280">
+  <img src="https://raw.githubusercontent.com/adidodot/reqtrace-py/main/assets/logo.png" alt="reqtrace-py logo" width="280">
 </p>
 
 # reqtrace-py
@@ -65,7 +65,7 @@ rt = ReqTrace(output="terminal", enabled=False)
 Visualize your log file in a browser-based UI with real-time updates, filtering, search, and diff viewer.
 
 <p align="center">
-  <img src="assets/screenshot-ui.png" alt="reqtrace-py Web UI Viewer" width="900">
+  <img src="https://raw.githubusercontent.com/adidodot/reqtrace-py/main/assets/screenshot-ui.png" alt="reqtrace-py Web UI Viewer" width="900">
 </p>
 
 First, configure reqtrace to write to a file:
